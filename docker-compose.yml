@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # 1. Baza danych PostgreSQL
+  db:
+    image: postgres:16-alpine
+    container_name: portfel_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: portfel_db
+      POSTGRES_USER: portfel_user
+      POSTGRES_PASSWORD: portfel_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # 2. Backend (Django REST Framework)
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    container_name: portfel_backend
+    restart: unless-stopped
+    environment:
+      # Podstawowa konfiguracja dla Django
+      - DEBUG=1
+      # Podłączamy się do kontenera "db" używając danych zdefiniowanych wyżej
+      - DATABASE_URL=postgres://portfel_user:portfel_password@db:5432/portfel_db
+      # Tutaj później dodamy klucze do JWT (np. SECRET_KEY)
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    # Opcjonalnie: montowanie kodu na żywo, aby zmiany w src/ od razu odświeżały serwer
+    volumes:
+      - ./apps/backend/src:/app/src
+
+  # 3. Frontend (Next.js)
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    container_name: portfel_frontend
+    restart: unless-stopped
+    environment:
+      # Frontend po stronie serwera uderza bezpośrednio do kontenera "backend"
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      # Tutaj później dodamy zmienne dla Auth.js (np. AUTH_SECRET, GITHUB_ID itp.)
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    # Opcjonalnie: montowanie kodu na żywo
+    volumes:
+      - ./apps/frontend/src:/app/src
+
+# Deklarujemy wolumen dla bazy danych, żeby dane nie znikały po restarcie kontenera
+volumes:
+  postgres_data:

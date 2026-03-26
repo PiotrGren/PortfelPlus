@@ -1,0 +1,25 @@
+# Git i Docker
+.git
+.gitignore
+.dockerignore
+Dockerfile
+
+# Zależności (kluczowe, żeby Docker sam je zainstalował od zera)
+node_modules/
+
+# Pliki wygenerowane lokalnie (Docker zbuduje własne)
+.next/
+out/
+build/
+coverage/
+
+# Sekrety
+.env
+.env*.local
+
+# Logi, IDE i inne
+npm-debug.log*
+.vscode/
+.idea/
+.DS_Store
+README.md

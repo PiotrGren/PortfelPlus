@@ -1,0 +1,23 @@
+# Główne pliki środowiskowe (niezależnie od tego, gdzie je utworzycie)
+.env
+.env.local
+.env.*
+
+# Foldery konfiguracyjne IDE i edytorów (VS Code, IntelliJ, WebStorm)
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Narzędzia systemowe (Windows / macOS)
+.DS_Store
+Thumbs.db
+
+# Na wypadek, gdyby ktoś przez pomyłkę zainstalował paczki lub środowisko w głównym folderze
+node_modules/
+venv/
+env/
+__pycache__/
+
+# Pliki z logami docker-compose (jeśli będziecie je zrzucać do plików)
+docker-compose.override.yml

@@ -1,0 +1,24 @@
+# Git i Docker
+.git
+.gitignore
+.dockerignore
+Dockerfile
+
+# Python / Środowiska lokalne
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.mypy_cache/
+.ruff_cache/
+
+# Sekrety (kontener powinien dostawać je z zewnątrz, np. przez GitHub Secrets / Render env vars)
+.env
+.env.*
+
+# Pliki deweloperskie i IDE
+.vscode/
+.idea/
+.DS_Store
+README.md

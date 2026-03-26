@@ -1,0 +1,66 @@
+name: BE - Portfel+
+
+on:
+  push:
+    branches: [ "**" ]
+    paths:
+      - 'apps/backend/**'
+      - 'gitlab/docker/build/**' # Zachowałem z Twojego configu
+  pull_request:
+    paths:
+      - 'apps/backend/**'
+      - 'gitlab/docker/build/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Run Ruff
+        run: ruff check src
+
+  type_check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install Mypy and dependencies
+        run: |
+          pip install mypy
+          # Jeśli dodasz plik requirements.txt w przyszłości, odkomentuj linię poniżej:
+          # pip install -r requirements.txt 
+
+      - name: Run Mypy
+        run: mypy src --config-file mypy.ini
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        working-directory: ./apps/backend
+        run: docker build -t portfel-backend:latest .
