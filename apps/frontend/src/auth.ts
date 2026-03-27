@@ -1,6 +1,8 @@
 import NextAuth from "next-auth"
 import MicrosoftEntraID from "@auth/core/providers/microsoft-entra-id"
- 
+import Google from "next-auth/providers/google"; 
+import GitHub from "next-auth/providers/github";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     MicrosoftEntraID({
@@ -8,7 +10,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
       issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
     }) as any,
-    
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+    }),
+    GitHub({
+      clientId: process.env.AUTH_GITHUB_ID,
+      clientSecret: process.env.AUTH_GITHUB_SECRET,
+    })
   ],
 
   callbacks: {
