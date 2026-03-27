@@ -7,6 +7,8 @@ import { SubmitButton } from '@/common/components/auth/authButtons/signInButton'
 import { SSOButton } from '@/common/components/auth/authButtons/ssoButton';
 import { FloatingInput } from '@/common/components/auth/authFields/FloatingInput';
 import { FloatingPhoneInput } from '@/common/components/auth/authFields/FloatingPhoneInput';
+import Image from 'next/image';
+import logoImg from '@/assets/logo2.png';
 
 export default function LoginPage() {
     const [view, setView] = useState<'login' | 'register'>('login');
@@ -98,9 +100,13 @@ export default function LoginPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="mb-8 text-center flex items-center justify-center gap-4"
                     >
-                        <div className="w-14 h-14 bg-gradient-to-br from-[#B266FF] to-purple-800 rounded-2xl flex items-center justify-center shadow-lg shadow-[#B266FF]/20">
-                            <span className="text-2xl font-bold">P+</span>
-                        </div>
+                        <Image 
+                            src={logoImg} // <--- TUTAJ ZMIANA
+                            alt="Logo Portfel+"
+                            //height={80}
+                            priority 
+                            className="drop-shadow-[0_10px_10px_rgba(178,102,255,0.2)]"
+                        />
                     </motion.div>
 
                     {/* Przełącznik widoku */}
