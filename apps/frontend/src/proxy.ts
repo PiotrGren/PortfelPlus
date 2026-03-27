@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 
 const APIAuthPrefix = "/api/auth/"
 
-export default auth((req: { auth?: any; nextUrl?: any; }) => {
+export default auth((req) => {
     const { nextUrl } = req
     const isLoggedIn = !!req.auth
 
