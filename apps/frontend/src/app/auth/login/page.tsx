@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Value } from 'react-phone-number-input';
+import { getApiClient } from '@/common/config/axios/axios.instance';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { SubmitButton } from '@/common/components/auth/authButtons/signInButton';
 import { SSOButton } from '@/common/components/auth/authButtons/ssoButton';
 import { FloatingInput } from '@/common/components/auth/authFields/FloatingInput';
@@ -12,6 +15,10 @@ import logoImg from '@/assets/logo2.png';
 
 export default function LoginPage() {
     const [view, setView] = useState<'login' | 'register'>('login');
+
+    const router = useRouter();
+    const [globalError, setGlobalError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -55,17 +62,70 @@ export default function LoginPage() {
         }
     };
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Logowanie własne...");
+        setGlobalError('');
+        setIsLoading(true);
+        
+        try {
+            const api = getApiClient();
+            
+            // Definiujemy <T, R>: 
+            // T (any) - pozwalamy wysłać dowolny obiekt (email, password)
+            // R - określamy, że z serwera wróci obiekt { access: string }
+            const res = await api.post<any, { access: string }>('/api/auth/login/', { 
+                email: email1, 
+                password: password1 
+            });
+            
+            // Axios zawsze zawija odpowiedź w obiekt, dlatego używamy res.data.access
+            await signIn('credentials', { 
+                access_token: res.data.access, 
+                callbackUrl: '/dashboard' 
+            });
+        } catch (err: any) {
+            setGlobalError(err.message || 'Błąd logowania');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const handleRegister = (e: React.FormEvent) => {
+    const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (emailMismatchError || passwordMismatchError) {
-            return;
+        if (emailMismatchError || passwordMismatchError) return;
+        
+        setGlobalError('');
+        setIsLoading(true);
+
+        try {
+            const api = getApiClient();
+            // Tworzymy payload z danymi
+            const payload = {
+                email: email1,
+                password: password1,
+                password_confirm: password2,
+                first_name: firstName,
+                last_name: lastName,
+                gender: gender,
+                nickname: nickname,
+                phone: phone ? String(phone) : '',
+                alt_email: altEmail
+            };
+
+            await api.post('/api/auth/register/', payload);
+            
+            // Po sukcesie wracamy na logowanie i czyścimy błędy
+            alert("Konto utworzone pomyślnie. Możesz się zalogować.");
+            setView('login');
+            setEmail1('');
+            setPassword1('');
+            setPassword2('');
+        } catch (err: any) {
+            // Tu zadziała extractMsgFromResponse z axios.errors.ts!
+            setGlobalError(err.message || 'Błąd rejestracji');
+        } finally {
+            setIsLoading(false);
         }
-        console.log("Rejestracja...");
     };
 
     return (
