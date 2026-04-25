@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # 1. Baza danych PostgreSQL
   db:
-    image: postgres:16-alpine
+    image: postgres:15-alpine
     container_name: portfel_db
     restart: unless-stopped
     environment:

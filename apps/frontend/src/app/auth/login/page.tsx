@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Value } from 'react-phone-number-input';
+import { getApiClient } from '@/common/config/axios/axios.instance';
+import { normalizeAPIClientError } from '@/common/config/axios/axios.errors';
+import { signIn } from 'next-auth/react';
 import { SubmitButton } from '@/common/components/auth/authButtons/signInButton';
 import { SSOButton } from '@/common/components/auth/authButtons/ssoButton';
 import { FloatingInput } from '@/common/components/auth/authFields/FloatingInput';
@@ -12,6 +15,8 @@ import logoImg from '@/assets/logo2.png';
 
 export default function LoginPage() {
     const [view, setView] = useState<'login' | 'register'>('login');
+
+    const [globalError, setGlobalError] = useState('');
     
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -55,17 +60,65 @@ export default function LoginPage() {
         }
     };
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Logowanie własne...");
+        setGlobalError('');
+        
+        try {
+            const api = getApiClient();
+            
+            // Definiujemy <T, R>: 
+            // T (any) - pozwalamy wysłać dowolny obiekt (email, password)
+            // R - określamy, że z serwera wróci obiekt { access: string }
+            const res = await api.post<Record<string, string>, { access: string }>('/api/auth/login/', { 
+                email: email1, 
+                password: password1 
+            });
+            
+            // Axios zawsze zawija odpowiedź w obiekt, dlatego używamy res.data.access
+            await signIn('credentials', { 
+                access_token: res.data.access, 
+                callbackUrl: '/dashboard' 
+            });
+        } catch (err: unknown) {
+            const error = normalizeAPIClientError(err);
+            setGlobalError(error.message);
+        }
     };
 
-    const handleRegister = (e: React.FormEvent) => {
+    const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (emailMismatchError || passwordMismatchError) {
-            return;
+        if (emailMismatchError || passwordMismatchError) return;
+        
+        setGlobalError('');
+
+        try {
+            const api = getApiClient();
+            // Tworzymy payload z danymi
+            const payload = {
+                email: email1,
+                password: password1,
+                password_confirm: password2,
+                first_name: firstName,
+                last_name: lastName,
+                gender: gender,
+                nickname: nickname,
+                phone: phone ? String(phone) : '',
+                alt_email: altEmail
+            };
+
+            await api.post('/api/auth/register/', payload);
+            
+            // Po sukcesie wracamy na logowanie i czyścimy błędy
+            alert("Konto utworzone pomyślnie. Możesz się zalogować.");
+            setView('login');
+            setEmail1('');
+            setPassword1('');
+            setPassword2('');
+        }catch (err: unknown) {
+            const error = normalizeAPIClientError(err);
+            setGlobalError(error.message);
         }
-        console.log("Rejestracja...");
     };
 
     return (
@@ -119,17 +172,32 @@ export default function LoginPage() {
                                 <FloatingInput 
                                     label="Email" 
                                     type="email" 
-                                    onChange={(e) => validateLoginEmail(e.target.value)}
+                                    value={email1} // <-- DODANE
+                                    onChange={(e) => {
+                                        setEmail1(e.target.value); // <-- DODANE (aktualizuje stan)
+                                        validateLoginEmail(e.target.value);
+                                    }}
                                 />
                                 {loginEmailError && <p className="text-red-400 text-xs mb-3 -mt-3 ml-2">{loginEmailError}</p>}
-                                
-                                <FloatingInput label="Hasło" type="password" />
+
+                                <FloatingInput 
+                                    label="Hasło" 
+                                    type="password" 
+                                    value={password1} // <-- DODANE
+                                    onChange={(e) => setPassword1(e.target.value)} // <-- DODANE
+                                />
                                 
                                 <div className="flex justify-start -mt-3 mb-3 2xl:mb-4 ml-1">
                                     <a href="#" className="text-xs 2xl:text-sm text-[#B266FF] hover:text-purple-400 transition-colors">
                                         Zapomniałem hasła...
                                     </a>
                                 </div>
+
+                                {globalError && (
+                                    <div className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-xl text-red-400 text-sm text-center font-medium">
+                                        {globalError}
+                                    </div>
+                                )}
 
                                 <SubmitButton>Zaloguj się</SubmitButton>
 
@@ -201,6 +269,12 @@ export default function LoginPage() {
                                     <FloatingPhoneInput label="Numer telefonu" value={phone} onChange={setPhone} />
                                     <FloatingInput label="Alternatywny adres email" type="email" value={altEmail} onChange={(e) => setAltEmail(e.target.value)} />
                                 </div>
+
+                                {globalError && (
+                                    <div className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-xl text-red-400 text-sm text-center font-medium">
+                                        {globalError}
+                                    </div>
+                                )}
 
                                 <SubmitButton>Utwórz konto</SubmitButton>
                             </motion.form>
