@@ -20,7 +20,7 @@ export const SSOButton = ({ provider, label }: { provider: SSOProvider, label: s
             whileHover={{ scale: 1.02, backgroundColor: "#252525" }} // hover: bg-zinc-700
             whileTap={{ scale: 0.98 }}
             onClick={() => signIn(provider, { callbackUrl: "/dashboard" })}
-            className="flex items-center justify-center gap-3 w-full py-2.5 rounded-xl bg-zinc-800 border border-zinc-700 text-sm font-medium text-zinc-100 transition-colors cursor-pointer"
+            className="flex items-center justify-center gap-3 w-full py-1.5 2xl:py-2.5 rounded-xl bg-zinc-800 border border-zinc-700 text-sm font-medium text-zinc-100 transition-colors cursor-pointer"
         >
             {icons[provider]}
             <span>{label}</span>

@@ -28,7 +28,7 @@ export const FloatingPhoneInput = ({ label, value, onChange }: FloatingPhoneInpu
                 value={value}
                 onChange={onChange}
                 // Magia Tailwinda: stylowanie tła flagi, ramki i uwidocznienie strzałki
-                className="w-full h-[50px] bg-zinc-800 border border-zinc-700 rounded-xl text-zinc-100 focus-within:border-[#B266FF] transition-colors peer flex items-stretch
+                className="w-full h-[44px] 2xl:h-[52px] bg-zinc-800 border border-zinc-700 rounded-xl text-zinc-100 focus-within:border-[#B266FF] transition-colors peer flex items-stretch
                 [&_.PhoneInputCountry]:bg-zinc-700 [&_.PhoneInputCountry]:px-3 [&_.PhoneInputCountry]:rounded-l-xl [&_.PhoneInputCountry]:mr-2 [&_.PhoneInputCountry]:border-r [&_.PhoneInputCountry]:border-zinc-600 [&_.PhoneInputCountrySelectArrow]:text-zinc-400 [&_.PhoneInputCountrySelectArrow]:opacity-100 [&_.PhoneInputCountrySelectArrow]:ml-2"
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
