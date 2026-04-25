@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Value } from 'react-phone-number-input';
 import { getApiClient } from '@/common/config/axios/axios.instance';
+import { normalizeAPIClientError } from '@/common/config/axios/axios.errors';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { SubmitButton } from '@/common/components/auth/authButtons/signInButton';
 import { SSOButton } from '@/common/components/auth/authButtons/ssoButton';
 import { FloatingInput } from '@/common/components/auth/authFields/FloatingInput';
@@ -16,9 +16,7 @@ import logoImg from '@/assets/logo2.png';
 export default function LoginPage() {
     const [view, setView] = useState<'login' | 'register'>('login');
 
-    const router = useRouter();
     const [globalError, setGlobalError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
     
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -65,7 +63,6 @@ export default function LoginPage() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setGlobalError('');
-        setIsLoading(true);
         
         try {
             const api = getApiClient();
@@ -83,10 +80,9 @@ export default function LoginPage() {
                 access_token: res.data.access, 
                 callbackUrl: '/dashboard' 
             });
-        } catch (err: any) {
-            setGlobalError(err.message || 'Błąd logowania');
-        } finally {
-            setIsLoading(false);
+        } catch (err: unknown) {
+            const error = normalizeAPIClientError(err);
+            setGlobalError(error.message);
         }
     };
 
@@ -95,7 +91,6 @@ export default function LoginPage() {
         if (emailMismatchError || passwordMismatchError) return;
         
         setGlobalError('');
-        setIsLoading(true);
 
         try {
             const api = getApiClient();
@@ -120,11 +115,9 @@ export default function LoginPage() {
             setEmail1('');
             setPassword1('');
             setPassword2('');
-        } catch (err: any) {
-            // Tu zadziała extractMsgFromResponse z axios.errors.ts!
-            setGlobalError(err.message || 'Błąd rejestracji');
-        } finally {
-            setIsLoading(false);
+        }catch (err: unknown) {
+            const error = normalizeAPIClientError(err);
+            setGlobalError(error.message);
         }
     };
 

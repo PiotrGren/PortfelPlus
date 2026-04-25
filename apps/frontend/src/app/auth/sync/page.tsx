@@ -46,9 +46,8 @@ export default function SyncPage() {
                 });
                 
                 router.push('/dashboard');
-            } catch (err) {
+            } catch (err: unknown) {
                 console.error("SSO Sync Error:", err);
-                // Błąd weryfikacji -> wyrzucamy na zewnątrz
                 signOut({ callbackUrl: '/auth/login?error=sync_failed' });
             }
         };

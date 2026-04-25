@@ -52,7 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = [] # Email i Hasło są domyślnie wymagane, reszta opcjonalna
+    REQUIRED_FIELDS: list[str] = [] # Email i Hasło są domyślnie wymagane, reszta opcjonalna
 
     def __str__(self):
         return self.email

@@ -1,10 +1,11 @@
-import requests
+import requests  # type: ignore
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated # Dodano IsAuthenticated
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from typing import Any
 
 from .models import User
 from .serializers import RegisterUserSerializer, LoginSerializer, SSOLoginSerializer, UserSerializer
@@ -29,8 +30,8 @@ def set_jwt_cookies(response, refresh_token):
 
 
 class RegisterView(APIView):
-    authentication_classes = []  # Brak uwierzytelniania dla tego endpointu
-    permission_classes = [AllowAny]
+    authentication_classes: list[Any] = []  # Brak uwierzytelniania dla tego endpointu
+    permission_classes: list[Any] = [AllowAny]
 
     def post(self, request):
         serializer = RegisterUserSerializer(data=request.data)
@@ -42,8 +43,8 @@ class RegisterView(APIView):
 
 
 class LoginView(APIView):
-    authentication_classes = []  # Brak uwierzytelniania dla tego endpointu
-    permission_classes = [AllowAny]
+    authentication_classes: list[Any] = []  # Brak uwierzytelniania dla tego endpointu
+    permission_classes: list[Any] = [AllowAny]
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
@@ -69,8 +70,8 @@ class LoginView(APIView):
 
 
 class SSOSyncView(APIView):
-    authentication_classes = []  # Brak uwierzytelniania dla tego endpointu
-    permission_classes = [AllowAny]
+    authentication_classes: list[Any] = []  # Brak uwierzytelniania dla tego endpointu
+    permission_classes: list[Any] = [AllowAny]
 
     def post(self, request):
         serializer = SSOLoginSerializer(data=request.data)
@@ -169,7 +170,7 @@ class SSOSyncView(APIView):
 # NOWY ENDPOINT: Zwraca dane zalogowanego użytkownika
 class UserMeView(APIView):
     # Wymaga ważnego tokenu JWT w nagłówku 'Authorization: Bearer <token>'
-    permission_classes = [IsAuthenticated]
+    permission_classes: list[Any] = [IsAuthenticated]
 
     def get(self, request):
         # request.user jest tutaj automatycznie ustawiany przez SimpleJWT jeśli token jest ważny
