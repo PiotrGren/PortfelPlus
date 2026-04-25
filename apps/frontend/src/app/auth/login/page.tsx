@@ -70,7 +70,7 @@ export default function LoginPage() {
             // Definiujemy <T, R>: 
             // T (any) - pozwalamy wysłać dowolny obiekt (email, password)
             // R - określamy, że z serwera wróci obiekt { access: string }
-            const res = await api.post<any, { access: string }>('/api/auth/login/', { 
+            const res = await api.post<Record<string, string>, { access: string }>('/api/auth/login/', { 
                 email: email1, 
                 password: password1 
             });

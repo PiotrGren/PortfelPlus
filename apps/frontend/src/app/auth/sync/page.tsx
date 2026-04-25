@@ -35,9 +35,9 @@ export default function SyncPage() {
                 
                 const backendProvider = providerMap[session.provider as string];
 
-                const res = await api.post<any, { access: string }>('/api/auth/sso/sync/', {
+                const res = await api.post<Record<string, string>, { access: string }>('/api/auth/sso/sync/', {
                     provider: backendProvider,
-                    token: session.accessToken
+                    token: session.accessToken as string
                 });
 
                 await update({ 
