@@ -179,17 +179,32 @@ export default function LoginPage() {
                                 <FloatingInput 
                                     label="Email" 
                                     type="email" 
-                                    onChange={(e) => validateLoginEmail(e.target.value)}
+                                    value={email1} // <-- DODANE
+                                    onChange={(e) => {
+                                        setEmail1(e.target.value); // <-- DODANE (aktualizuje stan)
+                                        validateLoginEmail(e.target.value);
+                                    }}
                                 />
                                 {loginEmailError && <p className="text-red-400 text-xs mb-3 -mt-3 ml-2">{loginEmailError}</p>}
-                                
-                                <FloatingInput label="Hasło" type="password" />
+
+                                <FloatingInput 
+                                    label="Hasło" 
+                                    type="password" 
+                                    value={password1} // <-- DODANE
+                                    onChange={(e) => setPassword1(e.target.value)} // <-- DODANE
+                                />
                                 
                                 <div className="flex justify-start -mt-3 mb-3 2xl:mb-4 ml-1">
                                     <a href="#" className="text-xs 2xl:text-sm text-[#B266FF] hover:text-purple-400 transition-colors">
                                         Zapomniałem hasła...
                                     </a>
                                 </div>
+
+                                {globalError && (
+                                    <div className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-xl text-red-400 text-sm text-center font-medium">
+                                        {globalError}
+                                    </div>
+                                )}
 
                                 <SubmitButton>Zaloguj się</SubmitButton>
 
@@ -261,6 +276,12 @@ export default function LoginPage() {
                                     <FloatingPhoneInput label="Numer telefonu" value={phone} onChange={setPhone} />
                                     <FloatingInput label="Alternatywny adres email" type="email" value={altEmail} onChange={(e) => setAltEmail(e.target.value)} />
                                 </div>
+
+                                {globalError && (
+                                    <div className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-xl text-red-400 text-sm text-center font-medium">
+                                        {globalError}
+                                    </div>
+                                )}
 
                                 <SubmitButton>Utwórz konto</SubmitButton>
                             </motion.form>

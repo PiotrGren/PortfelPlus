@@ -29,6 +29,7 @@ def set_jwt_cookies(response, refresh_token):
 
 
 class RegisterView(APIView):
+    authentication_classes = []  # Brak uwierzytelniania dla tego endpointu
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -41,6 +42,7 @@ class RegisterView(APIView):
 
 
 class LoginView(APIView):
+    authentication_classes = []  # Brak uwierzytelniania dla tego endpointu
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -67,6 +69,7 @@ class LoginView(APIView):
 
 
 class SSOSyncView(APIView):
+    authentication_classes = []  # Brak uwierzytelniania dla tego endpointu
     permission_classes = [AllowAny]
 
     def post(self, request):

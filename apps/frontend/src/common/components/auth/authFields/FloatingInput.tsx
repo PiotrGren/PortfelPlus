@@ -16,8 +16,10 @@ export const FloatingInput = ({ label, type = "text", ...props }: FloatingInputP
     return (
         <div className="relative w-full mb-5">
             <input
+                value={props.value !== undefined ? props.value : ''} 
+                
                 type={type}
-                className="w-full h-[44px] 2xl:h-[52px] bg-zinc-800 border border-zinc-700 rounded-xl px-3.5 text-zinc-100 focus:outline-none focus:border-[#B266FF] transition-colors peer"
+                className="w-full h-[44px] 2xl:h-[52px] bg-zinc-800 border border-zinc-700 rounded-xl px-3.5 text-zinc-100 focus:outline-none ..."
                 onFocus={() => setIsFocused(true)}
                 onBlur={(e) => {
                     setIsFocused(false);

@@ -9,8 +9,11 @@ export default async function DashboardPage() {
         redirect("/auth/login");
     }
 
+    // Zabezpieczamy się przed brakiem zmiennej środowiskowej
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
     // Pobieranie profilu użytkownika bezpośrednio z naszego Django
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me/`, {
+    const res = await fetch(`${API_URL}/api/auth/me/`, {
         headers: {
             'Authorization': `Bearer ${session.accessToken}`,
             'Content-Type': 'application/json'
