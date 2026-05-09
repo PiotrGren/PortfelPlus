@@ -44,6 +44,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=30, null=True, blank=True)
     alt_email = models.EmailField(null=True, blank=True)
 
+    # Preferowana waluta
+    preferred_currency = models.ForeignKey(
+        'finances.Currency', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='users'
+    )
+
     # Pola administracyjne Django
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
