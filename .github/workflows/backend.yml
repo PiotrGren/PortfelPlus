@@ -47,18 +47,38 @@ jobs:
       - name: Install Mypy and dependencies
         run: |
           pip install mypy
-          # Jeśli dodasz plik requirements.txt w przyszłości, odkomentuj linię poniżej:
-          # pip install -r requirements.txt 
+          pip install -r requirements.txt 
 
       - name: Run Mypy
         run: mypy src --config-file mypy.ini
 
-  build:
+  build_and_push:
+    needs: [lint, type_check]
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    permissions:
+      contents: read
+      packages: write
 
-      - name: Build Docker image
-        working-directory: ./apps/backend
-        run: docker build -t portfel-backend:latest .
+    steps:
+      -name Log in to GitHub Container Registry
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/portfel-backend
+
+      - name: Build and (conditionally) push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/backend
+          file: ./apps/backend/Dockerfile
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
