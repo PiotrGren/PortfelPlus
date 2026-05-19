@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.db.models import Sum
 from decimal import Decimal
 
-from .models import Wallet, Category, Transaction, RecurringPlan
+from .models import Category, Transaction, RecurringPlan
 from .serializers import WalletSerializer, CategorySerializer, TransactionSerializer, RecurringPlanSerializer
 
 def update_wallet_pending_and_free_funds(wallet):

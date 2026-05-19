@@ -6,4 +6,5 @@ class FinancesConfig(AppConfig):
     name = 'finances'
 
     def ready(self):
-        import finances.signals
+        # pylint: disable=unused-import
+        import finances.signals # noqa: F401 - Import sygnałów, aby były zarejestrowane
