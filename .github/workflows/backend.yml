@@ -74,6 +74,13 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}/portfel-backend
 
+      - name: Sprawdzenie struktury katalogów na serwerze (DEBUG)
+        run: |
+          echo "=== Zawartość głównego katalogu repozytorium ==="
+          ls -la
+          echo "=== Zawartość folderu apps (jeśli istnieje) ==="
+          ls -la apps/ || echo "UWAGA: Folder 'apps' w ogóle tutaj nie istnieje!"
+
       - name: Build and (conditionally) push Docker image
         uses: docker/build-push-action@v5
         with:
