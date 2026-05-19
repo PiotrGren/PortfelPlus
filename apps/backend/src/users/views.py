@@ -167,12 +167,20 @@ class SSOSyncView(APIView):
             }
 
 
-# NOWY ENDPOINT: Zwraca dane zalogowanego użytkownika
 class UserMeView(APIView):
-    # Wymaga ważnego tokenu JWT w nagłówku 'Authorization: Bearer <token>'
     permission_classes: list[Any] = [IsAuthenticated]
 
     def get(self, request):
-        # request.user jest tutaj automatycznie ustawiany przez SimpleJWT jeśli token jest ważny
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        """Endpoint do personalizacji informacji o koncie"""
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            user = request.user
+            user.full_name = f"{user.first_name or ''} {user.last_name or ''}".strip()
+            user.save()
+            return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
