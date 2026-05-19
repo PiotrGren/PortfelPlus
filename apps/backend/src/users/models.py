@@ -65,3 +65,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+    
+
+class TestMode(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='test_mode')
+    is_test_mode = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.email} - Test Mode: {self.is_test_mode}"
