@@ -7,6 +7,7 @@ class TransactionType(models.TextChoices):
     INCOME = 'INCOME', 'Przychód'
     EXPENSE = 'EXPENSE', 'Wydatek'
 
+# CHANGE
 class Category(models.Model):
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=10, choices=TransactionType.choices)
