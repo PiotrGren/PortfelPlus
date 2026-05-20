@@ -52,43 +52,31 @@ jobs:
       - name: Run Mypy
         run: mypy src --config-file mypy.ini
 
-  build_and_push:
+  build_and_publish:
     needs: [lint, type_check]
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
+      id-token: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         
-      - name: Log in to GitHub Container Registry
+      - name: Authenticate to Google Cloud
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-        uses: docker/login-action@v3
+        uses: google-github-actions/auth@v2
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}/portfel-backend
+      - name: Configure Docker for GCP
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        run: gcloud auth configure-docker europe-central2-docker.pkg.dev --quiet
 
-      - name: Sprawdzenie struktury katalogów na serwerze (DEBUG)
-        run: |
-          echo "=== Zawartość głównego katalogu repozytorium ==="
-          ls -la
-          echo "=== Zawartość folderu apps (jeśli istnieje) ==="
-          ls -la apps/ || echo "UWAGA: Folder 'apps' w ogóle tutaj nie istnieje!"
-
-      - name: Build and (conditionally) push Docker image
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./apps/backend
           file: ./apps/backend/Dockerfile
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: europe-central2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/portfel-repo/portfel-backend:latest

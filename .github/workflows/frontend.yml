@@ -50,7 +50,7 @@ jobs:
       - name: Run tests
         run: npm run test
 
-  build_and_push:
+  build_and_publish:
     needs: [lint, test]
     runs-on: ubuntu-latest
     permissions:
@@ -61,25 +61,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Log in to GitHub Container Registry
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: docker/login-action@v3
+      # 1. Logowanie do Google Cloud
+      - name: Authenticate to Google Cloud
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        uses: google-github-actions/auth@v2
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}/portfel-frontend
+      # 2. Konfiguracja Dockera pod Google Artifact Registry
+      - name: Configure Docker for GCP
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        run: gcloud auth configure-docker europe-central2-docker.pkg.dev --quiet
 
-      - name: Build and (conditionally) push Docker image
+      # 3. Budowanie i wypychanie do GCP
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./apps/frontend
           file: ./apps/frontend/Dockerfile
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          # Tag celujący prosto do Twojego Artifact Registry
+          tags: europe-central2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/portfel-repo/portfel-frontend:latest
